@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoRecycle | Connect. Recycle. Sustain.</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="canvas-container"></div>
+    <div id="toast-container"></div>
+
+    <div id="landing-page" class="landing-wrapper">
+        
+        <nav class="landing-nav glass-nav">
+            <div class="nav-brand"><i class="fa-solid fa-leaf"></i> EcoRecycle</div>
+            <div class="nav-links">
+                <a href="#home"><i class="fa-solid fa-house"></i> HOME</a>
+                <a href="#the-crisis"><i class="fa-solid fa-globe"></i> THE CRISIS</a>
+                <a href="#how-it-works"><i class="fa-solid fa-flag"></i> HOW IT WORKS</a>
+                <a href="#standard-rates"><i class="fa-solid fa-tags"></i> STANDARD RATES</a>
+                <a href="#" onclick="showLoginScreen('signup')"><i class="fa-regular fa-address-card"></i> REGISTER</a>
+                <a href="#" class="btn-gradient-small" onclick="showLoginScreen('login')"><i class="fa-solid fa-recycle"></i> LOGIN</a>
+            </div>
+        </nav>
+
+        <section id="home" class="landing-hero">
+            <div class="hero-content fade-in">
+                <h1 class="glow-text-large">We need to save our Mother Earth</h1>
+                <h2 class="glow-text">Turn Your Waste Into Value</h2>
+                <p class="hero-subtext">Join thousands of residents and verified recyclers making a real impact. Schedule your free doorstep pickup today and help save Mother Earth.</p>
+                <button class="btn-gradient hero-btn" onclick="showLoginScreen('signup')">Start Recycling Now <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <section id="the-crisis" class="landing-section">
+            <h2 class="section-title"><i class="fa-solid fa-earth-americas"></i> The Crisis & Our Solution</h2>
+            <p class="section-subtitle">The traditional recycling system is broken. Here is how our platform fixes it.</p>
+            
+            <div class="crisis-solution-grid">
+                <div class="glass-card problem-card">
+                    <h3 style="color: #ff6b6b; margin-bottom: 25px; font-size: 1.5rem; text-align: left; border-bottom: 1px solid rgba(255,107,107,0.3); padding-bottom: 10px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> The Current Problem
+                    </h3>
+                    <ul class="crisis-list">
+                        <li><i class="fa-solid fa-mountain-city" style="color: #ff6b6b;"></i> <div><strong>Overflowing Landfills</strong><p>Millions of tons of recyclable waste end up in landfills or oceans due to a lack of accessible collection systems.</p></div></li>
+                        <li><i class="fa-solid fa-user-ninja" style="color: #ff6b6b;"></i> <div><strong>Unfair Pricing</strong><p>Residents often get cheated by informal scrap dealers with rigged scales and hidden market rates.</p></div></li>
+                        <li><i class="fa-solid fa-fire-flame-curved" style="color: #ff6b6b;"></i> <div><strong>Resource Depletion</strong><p>Valuable materials are incinerated, releasing toxic fumes and wasting raw materials.</p></div></li>
+                    </ul>
+                </div>
+                <div class="glass-card solution-card">
+                    <h3 style="color: #4ade80; margin-bottom: 25px; font-size: 1.5rem; text-align: left; border-bottom: 1px solid rgba(74,222,128,0.3); padding-bottom: 10px;">
+                        <i class="fa-solid fa-shield-heart"></i> How We Fix It
+                    </h3>
+                    <ul class="crisis-list">
+                        <li><i class="fa-solid fa-truck-fast" style="color: #4ade80;"></i> <div><strong>Seamless Connectivity</strong><p>We digitally bridge the gap between residents and verified recyclers for on-demand doorstep pickups.</p></div></li>
+                        <li><i class="fa-solid fa-hand-holding-dollar" style="color: #4ade80;"></i> <div><strong>Transparent Bidding</strong><p>You set your expected price based on our standard guide. Recyclers see it. Total transparency.</p></div></li>
+                        <li><i class="fa-solid fa-recycle" style="color: #4ade80;"></i> <div><strong>Guaranteed Circular Economy</strong><p>Every item collected is tracked and routed directly to authorized processing facilities.</p></div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="landing-section">
+            <h2 class="section-title"><i class="fa-solid fa-flag"></i> How It Works</h2>
+            <div class="steps-container">
+                <div class="glass-card step"><div class="step-number">1</div><h3>Segregate</h3><p>Keep your dry recyclable waste separate from your wet garbage.</p></div>
+                <div class="glass-card step"><div class="step-number">2</div><h3>Quote & Schedule</h3><p>Post your waste details, enter your asking price, and request a pickup.</p></div>
+                <div class="glass-card step"><div class="step-number">3</div><h3>Get Paid</h3><p>A registered recycler will accept your rate, pick up the waste, and pay you.</p></div>
+            </div>
+        </section>
+
+        <section id="standard-rates" class="landing-section">
+            <h2 class="section-title"><i class="fa-solid fa-tags"></i> Standard Market Rates</h2>
+            <p class="section-subtitle">Use these average market prices as a guide when setting your expected rate.</p>
+            <div class="glass-card table-wrapper">
+                <table class="rates-table">
+                    <thead><tr><th>Material Type</th><th>Average Price (per kg)</th></tr></thead>
+                    <tbody>
+                        <tr><td><i class="fa-regular fa-newspaper" style="color:#56CCF2;"></i> Newspapers / Paper</td><td>₹15 - ₹20</td></tr>
+                        <tr><td><i class="fa-solid fa-box-open" style="color:#56CCF2;"></i> Cardboard / Cartons</td><td>₹10 - ₹14</td></tr>
+                        <tr><td><i class="fa-solid fa-bottle-water" style="color:#56CCF2;"></i> Plastics (PET, Hard)</td><td>₹12 - ₹18</td></tr>
+                        <tr><td><i class="fa-solid fa-plug" style="color:#56CCF2;"></i> E-Waste / Appliances</td><td>₹30 - ₹50</td></tr>
+                        <tr><td><i class="fa-solid fa-can-food" style="color:#56CCF2;"></i> Metals (Iron, Steel, Copper)</td><td>₹35 - ₹400+</td></tr>
+                        <tr><td><i class="fa-solid fa-wine-glass" style="color:#56CCF2;"></i> Glass Bottles</td><td>₹2 - ₹5</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        
+        <footer class="landing-footer fade-in">
+            <div class="glass-card footer-card">
+                <p class="footer-thought">"The greatest threat to our planet is the belief that someone else will save it."</p>
+                <div class="footer-founders">
+                    <p>Founded by</p>
+                    <div class="founders-list">
+                        <span class="founder-item">
+                            <strong>Tushar Sharma</strong> 
+                            <a href="mailto:tushar.sharma24@pccoepune.org" class="founder-email"><i class="fa-regular fa-envelope"></i> tushar.sharma24@pccoepune.org</a>
+                        </span>
+                        <span class="divider">&bull;</span>
+                        <span class="founder-item">
+                            <strong>Anushka Bhagat</strong> 
+                            <a href="mailto:anushka.bhagat24@pccoepune.org" class="founder-email"><i class="fa-regular fa-envelope"></i> anushka.bhagat24@pccoepune.org</a>
+                        </span>
+                        <span class="divider">&bull;</span>
+                        <span class="founder-item">
+                            <strong>Aryan Lad</strong> 
+                            <a href="mailto:aryan.lad24@pccoepune.org" class="founder-email"><i class="fa-regular fa-envelope"></i> aryan.lad24@pccoepune.org</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <h2 id="earth-quote">"We need to save our Mother Earth."</h2>
+
+    <div id="login-container" class="login-wrapper">
+        <div class="glass-card login-card">
+            
+            <h1 id="auth-title">Login</h1>
+            
+            <form id="login-form">
+                <div class="input-container">
+                    <label>Email Address</label>
+                    <div class="input-wrapper"><i class="fa-regular fa-envelope"></i><input type="email" id="email" placeholder="e.g., yourname@gmail.com" required></div>
+                </div>
+                <div class="input-container">
+                    <label>Password</label>
+                    <div class="input-wrapper"><i class="fa-solid fa-lock"></i><input type="password" id="password" placeholder="Type your password" required></div>
+                </div>
+                <div class="input-container">
+                    <label>I am a...</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <select id="role" required>
+                            <option value="" disabled selected>Select your role...</option>
+                            <option value="giver">Resident (Have Waste)</option>
+                            <option value="collector">Recycler (Collect Waste)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="forgot-password"><a href="#" onclick="cancelLogin()" style="float: left;"><i class="fa-solid fa-arrow-left"></i> Back</a><a href="#">Forgot password?</a></div>
+                
+                <button type="button" id="auth-main-btn" class="btn-gradient" onclick="submitAuth()">LOGIN</button>
+            </form>
+
+            <div style="margin-top: 20px; font-size: 0.9rem; color: #ccc;">
+                <span id="auth-toggle-text">Don't have an account?</span> 
+                <a href="#" style="color: #56CCF2; text-decoration: none; font-weight: 700;" id="auth-toggle-link" onclick="toggleAuthMode()">Sign up here</a>
+            </div>
+
+            <div class="social-login">
+                <p>Or Sign In Using</p>
+                <div class="social-icons">
+                    <button class="social-btn google" type="button" onclick="loginWithGoogle()"><i class="fa-brands fa-google"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <nav id="dashboard-navbar" class="dashboard-nav hidden">
+        <div class="nav-brand"><i class="fa-solid fa-leaf"></i> EcoRecycle</div>
+        <div class="nav-user">
+            <span id="nav-username-display" class="user-badge" onclick="openProfileModal()" title="View & Edit Profile"></span>
+            <button class="btn-logout-small" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> LOGOUT</button>
+        </div>
+    </nav>
+
+    <div id="giver-page" class="container dashboard-container wide-dashboard hidden fade-in">
+        <div class="dashboard-layout">
+            
+            <div class="main-column">
+                <div class="glass-card impact-grid mb-2">
+                    <div class="impact-stat">
+                        <i class="fa-solid fa-indian-rupee-sign" style="color: #4ade80;"></i>
+                        <h3 id="stat-earned">0</h3>
+                        <p>Total Earned</p>
+                    </div>
+                    <div class="impact-stat">
+                        <i class="fa-solid fa-weight-scale" style="color: #56CCF2;"></i>
+                        <h3 id="stat-kg">0</h3>
+                        <p>kg Recycled</p>
+                    </div>
+                    <div class="impact-stat">
+                        <i class="fa-solid fa-cloud" style="color: #d43f8d;"></i>
+                        <h3 id="stat-co2">0</h3>
+                        <p>kg CO2 Saved</p>
+                    </div>
+                </div>
+
+                <div class="glass-card mb-2">
+                    <h3 style="color: #56CCF2; margin-bottom: 15px; text-align: left; font-size: 1.1rem;"><i class="fa-solid fa-wallet"></i> My Earnings Breakdown</h3>
+                    <div id="my-earnings-breakdown" style="display: flex; flex-wrap: wrap; gap: 15px; text-align: left;">
+                        <p style="color:#aaa; font-size:0.85rem; width: 100%;">No completed pickups yet to show a breakdown.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card mb-2">
+                    <h3 style="color: #4ade80; margin-bottom: 5px; text-align: left;"><i class="fa-solid fa-recycle"></i> Post Recyclable Waste</h3>
+                    <p style="text-align: left; color: #ccc; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px;">Enter details below and set your expected rate.</p>
+                    
+                    <div class="image-upload-wrapper">
+                        <label for="waste-image" class="image-upload-label"><i class="fa-solid fa-camera"></i> Click to Upload Photo</label>
+                        <input type="file" id="waste-image" accept="image/*" onchange="previewImage(event)">
+                        <img id="image-preview" class="hidden" alt="Waste Preview">
+                    </div>
+
+                    <div class="grid-form-3 mb-2">
+                        <div class="input-wrapper"><i class="fa-solid fa-box-open"></i><select id="waste-type"><option value="Paper">Paper / Box</option><option value="Plastics">Plastics</option><option value="E-Waste">E-Waste</option><option value="Metals">Metals</option><option value="Glass">Glass</option></select></div>
+                        <div class="input-wrapper"><i class="fa-solid fa-weight-scale"></i><input type="number" id="waste-weight" placeholder="Weight (kg)"></div>
+                        <div class="input-wrapper"><i class="fa-solid fa-money-bill-wave"></i><input type="number" id="waste-rate" placeholder="Expected ₹"></div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <div class="location-group mb-2">
+                            <div class="input-wrapper" style="flex-grow: 1;"><i class="fa-solid fa-location-dot"></i><input type="text" id="waste-address" placeholder="Street Address"></div>
+                        </div>
+                        <div class="location-group mb-2">
+                            <div class="input-wrapper" style="flex-grow: 1;"><i class="fa-solid fa-satellite"></i><input type="text" id="waste-coords" placeholder="Live Coordinates (Optional)" readonly></div>
+                            <button class="btn-location" type="button" onclick="getLocation()"><i class="fa-solid fa-crosshairs"></i></button>
+                        </div>
+                        <div class="location-group mb-2">
+                            <div class="input-wrapper" style="flex-grow: 1;"><i class="fa-solid fa-city"></i><input type="text" id="waste-city" placeholder="City"></div>
+                            <div class="input-wrapper" style="flex-grow: 1;"><i class="fa-solid fa-map-pin"></i><input type="number" id="waste-pincode" placeholder="Pincode"></div>
+                        </div>
+                    </div>
+                    <button class="btn-gradient mt-3" onclick="submitRequest()">Post Request <i class="fa-solid fa-cloud-arrow-up"></i></button>
+                </div>
+
+                <div class="glass-card mb-2">
+                    <h3 style="color: #fff; text-align: left; margin-bottom: 15px;"><i class="fa-solid fa-clock-rotate-left"></i> My Active Requests</h3>
+                    <div id="my-requests-list" class="dynamic-list"></div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 style="color: #aaa; text-align: left; margin-bottom: 15px;"><i class="fa-solid fa-check-double"></i> Past Receipts</h3>
+                    <div id="my-history-list" class="dynamic-list"></div>
+                </div>
+            </div>
+
+            <div class="side-column">
+                <div class="glass-card sticky-sidebar" style="padding: 25px 20px;">
+                    <h3 style="color: #56CCF2; text-align: left; margin-bottom: 10px; font-size: 1.2rem;"><i class="fa-solid fa-truck-fast"></i> Nearby Recyclers</h3>
+                    
+                    <div id="nearby-city-display" style="font-size: 0.85rem; color: #aaa; text-align: left; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+                        Showing recyclers in: <strong>Update Profile</strong>
+                    </div>
+                    
+                    <div class="nearby-stat-box">
+                        <h2 id="nearby-count">0</h2>
+                        <p>Active in your area</p>
+                    </div>
+
+                    <div id="nearby-recyclers-list" style="margin-top: 15px;"></div>
+
+                    <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                        <h3 style="color: #4ade80; text-align: left; margin-bottom: 15px; font-size: 1.1rem;"><i class="fa-solid fa-chart-pie"></i> Area Impact</h3>
+                        <p style="font-size: 0.8rem; color: #aaa; text-align: left; margin-bottom: 15px;">Total waste recycled in your city:</p>
+                        <div id="impact-breakdown-list">
+                            </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <div id="collector-page" class="container dashboard-container hidden fade-in">
+        
+        <div class="glass-card mb-2" style="padding: 20px;">
+            <h3 style="color: #4ade80; text-align: left; margin-bottom: 15px;"><i class="fa-solid fa-map-location-dot"></i> Live Pickup Radar</h3>
+            <div id="recycler-map" style="height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);"></div>
+        </div>
+
+        <div class="glass-card mb-2" style="border-top: 3px solid #56CCF2;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="color: #fff; margin: 0;"><i class="fa-solid fa-truck-ramp-box"></i> My Accepted Routes</h3>
+            </div>
+            <div id="my-routes-list" class="dynamic-list"></div>
+        </div>
+
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h3 style="color: #fff; margin: 0;"><i class="fa-solid fa-list"></i> Available Pickups</h3>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <div class="input-wrapper" style="margin: 0;">
+                        <i class="fa-solid fa-recycle" style="font-size: 0.8rem;"></i>
+                        <select id="type-filter" onchange="renderCollectorPickups()" style="padding: 5px 10px 5px 25px; width: 140px; font-size: 0.85rem; cursor: pointer;">
+                            <option value="">All Materials</option>
+                            <option value="Paper">Paper / Box</option>
+                            <option value="Plastics">Plastics</option>
+                            <option value="E-Waste">E-Waste</option>
+                            <option value="Metals">Metals</option>
+                            <option value="Glass">Glass</option>
+                        </select>
+                    </div>
+                    <div class="input-wrapper" style="margin: 0;">
+                        <i class="fa-solid fa-filter" style="font-size: 0.8rem;"></i>
+                        <input type="text" id="city-filter" placeholder="Filter by City" onkeyup="renderCollectorPickups()" style="padding: 5px 10px 5px 25px; width: 130px; font-size: 0.85rem;">
+                    </div>
+                    <span class="badge" id="pickup-count">0</span>
+                </div>
+            </div>
+            <div id="available-pickups-list" class="dynamic-list"></div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal-overlay hidden">
+        <div class="glass-card modal-card fade-in" style="border-top: 4px solid #56CCF2;">
+            <div class="modal-header">
+                <h3 style="color: #fff; margin: 0;"><i class="fa-solid fa-id-card-clip" style="color: #56CCF2;"></i> User Profile</h3>
+                <button class="close-btn" onclick="closeProfileModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="text-align: left;">
+                <div class="input-container">
+                    <label>Full Name</label>
+                    <div class="input-wrapper"><i class="fa-regular fa-user"></i><input type="text" id="profile-name" placeholder="Enter your full name"></div>
+                </div>
+                <div class="input-container">
+                    <label>City / Location</label>
+                    <div class="input-wrapper"><i class="fa-solid fa-city"></i><input type="text" id="profile-city" placeholder="Enter your operating city"></div>
+                </div>
+                <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px; text-align: center;">Account Role: <strong id="profile-role" style="color: #4ade80; text-transform: uppercase;"></strong></p>
+                <button class="btn-gradient" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
