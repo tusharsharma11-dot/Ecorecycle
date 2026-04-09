@@ -138,49 +138,63 @@ function cancelLogin() {
     setTimeout(() => pages.landing.classList.remove('hide'), 1000);
 }
 
-async function submitAuth() {
-    const emailInput = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const role = document.getElementById('role').value;
+// 🚀 FIXED: Bulletproof submitAuth with proper try/catch and Enter key prevention
+async function submitAuth(event) {
+    if (event) event.preventDefault(); // Prevents the "Enter Key" from reloading the page!
 
-    if (!emailInput || !password || !role) {
-        return showToast("Please fill in Email, Password, and select a Role.");
-    }
+    try {
+        const emailInput = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
 
-    const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
-    if (!gmailRegex.test(emailInput)) {
-        return showToast("Please enter a valid @gmail.com address.");
-    }
-
-    showToast("Processing... Please wait.");
-
-    if (currentAuthMode === 'signup') {
-        const defaultName = emailInput.split('@')[0];
-
-        const { data, error } = await supabaseClient.auth.signUp({
-            email: emailInput, 
-            password: password,
-            options: { data: { role: role, display_name: defaultName } } 
-        });
-
-        if (error) return showToast("Sign Up Error: " + error.message);
-        showToast("Account created successfully!");
-        
-    } else if (currentAuthMode === 'login') {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: emailInput, 
-            password: password
-        });
-
-        if (error) return showToast("Login Error: Incorrect email or password."); 
-        
-        const savedRole = data.user.user_metadata.role;
-        if (savedRole && savedRole !== role) {
-            await supabaseClient.auth.signOut(); 
-            const properRoleName = savedRole === 'giver' ? 'Resident' : 'Recycler';
-            return showToast(`Error: This email belongs to a ${properRoleName}.`);
+        if (!emailInput || !password || !role) {
+            return showToast("Please fill in Email, Password, and select a Role.");
         }
-        showToast("Login successful!");
+
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
+        if (!gmailRegex.test(emailInput)) {
+            return showToast("Please enter a valid @gmail.com address.");
+        }
+
+        showToast("Processing... Please wait.");
+
+        if (currentAuthMode === 'signup') {
+            const defaultName = emailInput.split('@')[0];
+
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: emailInput, 
+                password: password,
+                options: { data: { role: role, display_name: defaultName } } 
+            });
+
+            if (error) return showToast("Sign Up Error: " + error.message);
+            
+            // Check if email confirmation is turned on in Supabase
+            if (data.session === null) {
+                return showToast("Please check your email to verify your account, or disable Confirm Email in Supabase settings.");
+            }
+            
+            showToast("Account created successfully!");
+            
+        } else if (currentAuthMode === 'login') {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: emailInput, 
+                password: password
+            });
+
+            if (error) return showToast("Login Error: " + error.message); 
+            
+            const savedRole = data.user?.user_metadata?.role;
+            if (savedRole && savedRole !== role) {
+                await supabaseClient.auth.signOut(); 
+                const properRoleName = savedRole === 'giver' ? 'Resident' : 'Recycler';
+                return showToast(`Error: This email belongs to a ${properRoleName}.`);
+            }
+            showToast("Login successful!");
+        }
+    } catch (err) {
+        console.error(err);
+        showToast("An unexpected error occurred: " + err.message);
     }
 }
 
@@ -198,9 +212,6 @@ async function loginWithGoogle() {
     if (error) showToast("Google Login Error: " + error.message);
 }
 
-// ==========================================
-// BULLETPROOF AUTHENTICATION LISTENER
-// ==========================================
 supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
         const user = session.user;
@@ -221,7 +232,6 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
             localStorage.removeItem('pendingGoogleRole');
         }
 
-        // FIX: Guarantee they exist in the public profiles table every time they log in!
         if (role) {
             await supabaseClient.from('profiles').upsert([
                 { id: user.id, display_name: displayName, role: role, city: city }
@@ -274,22 +284,50 @@ function loadDashboard(user, role, displayNameOverride) {
 }
 
 async function logout() {
+    showToast("Logging out...");
     await supabaseClient.auth.signOut(); 
     
-    pages.giver.classList.add('hidden'); pages.collector.classList.add('hidden'); pages.dashboardNav.classList.add('hidden');
+    pages.giver.classList.add('hidden'); 
+    pages.collector.classList.add('hidden'); 
+    pages.dashboardNav.classList.add('hidden');
+    
     document.getElementById('login-form').reset();
     isDashboard = false; targetCameraZ = 16; targetEarthPositionX = 0; targetEarthRotationY = null; targetEarthRotationX = 0;
     pages.landing.scrollTop = 0; 
-    setTimeout(() => pages.landing.classList.remove('hide'), 1500);
-    showToast("Logged out successfully.");
+    
+    setTimeout(() => {
+        pages.landing.classList.remove('hide');
+    }, 300);
+    
+    setTimeout(() => {
+        showToast("Logged out successfully.");
+    }, 500);
 }
 
 // ==========================================
-// 3. PROFILE & SIDEBAR LOGIC
+// 3. PROFILE, SIDEBAR & MODAL LOGIC
 // ==========================================
 
 function openProfileModal() { document.getElementById('profile-modal').classList.remove('hidden'); }
 function closeProfileModal() { document.getElementById('profile-modal').classList.add('hidden'); }
+
+function openRequestModal(id) {
+    const req = wasteRequests.find(r => r.id === id);
+    if(!req) return;
+
+    document.getElementById('modal-req-img').src = req.image_data;
+    document.getElementById('modal-req-title').innerText = `${req.type} (${req.weight} kg)`;
+    document.getElementById('modal-req-price').innerText = `Expected/Paid: ₹${req.rate}`;
+    document.getElementById('modal-req-address').innerText = `${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''}`;
+    document.getElementById('modal-req-user').innerText = `Posted by: ${req.user_name}`;
+    document.getElementById('modal-req-coords').innerText = req.coords || 'No coordinates provided';
+
+    document.getElementById('request-modal').classList.remove('hidden');
+}
+
+function closeRequestModal() {
+    document.getElementById('request-modal').classList.add('hidden');
+}
 
 async function saveProfile() {
     const newName = document.getElementById('profile-name').value.trim();
@@ -306,7 +344,6 @@ async function saveProfile() {
 
     document.getElementById('nav-username-display').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${newName}`;
     
-    // FIX: Using UPSERT to guarantee it saves to the database correctly.
     const userSession = await supabaseClient.auth.getSession();
     if(userSession.data.session) {
         const user = userSession.data.session.user;
@@ -578,7 +615,6 @@ async function completePickup(id) {
     }
 }
 
-// NEW/UPDATED: The detailed Personal Earnings Breakdown function
 function calculateImpact(history) {
     let earned = 0; let kg = 0;
     const earningsByType = {}; 
@@ -654,14 +690,16 @@ function renderGiverRequests(username) {
         const statusColor = req.status === 'Pending' ? '#f59e0b' : '#56CCF2';
         const coordsHTML = req.coords ? `<br><i class="fa-solid fa-satellite" style="font-size:0.8rem; color:#56CCF2;"></i> <span style="font-size:0.85rem; color:#56CCF2;">${req.coords}</span>` : '';
         const collectorHTML = req.collector_name ? `<p style="color: #4ade80; font-size: 0.85rem; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-truck"></i> Accepted by Recycler: <strong>${req.collector_name}</strong></p>` : '';
-        activeList.innerHTML += `<div class="list-item fade-in"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Asking: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p>Status: <strong style="color: ${statusColor}">${req.status}</strong></p>${collectorHTML}</div></div>`;
+        
+        activeList.innerHTML += `<div class="list-item fade-in" style="cursor: pointer;" onclick="openRequestModal(${req.id})"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Asking: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p>Status: <strong style="color: ${statusColor}">${req.status}</strong></p>${collectorHTML}</div></div>`;
     });
 
     historyList.innerHTML = historyReqs.length === 0 ? "<p style='color:#aaa; text-align:center;'>No past receipts.</p>" : "";
     historyReqs.forEach(req => {
         const coordsHTML = req.coords ? `<br><i class="fa-solid fa-satellite" style="font-size:0.8rem; color:#56CCF2;"></i> <span style="font-size:0.85rem; color:#56CCF2;">${req.coords}</span>` : '';
         const collectorHTML = req.collector_name ? `<p style="color: #4ade80; font-size: 0.85rem; margin-top: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-handshake"></i> Recycled securely by: <strong>${req.collector_name}</strong></p>` : '';
-        historyList.innerHTML += `<div class="list-item fade-in" style="opacity: 0.7;"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4 style="color:#aaa;">${req.type} (${req.weight} kg) - Paid: ₹${req.rate}</h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p>Status: <strong style="color: #4ade80;"><i class="fa-solid fa-check-double"></i> Completed</strong></p>${collectorHTML}</div></div>`;
+        
+        historyList.innerHTML += `<div class="list-item fade-in" style="opacity: 0.7; cursor: pointer;" onclick="openRequestModal(${req.id})"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4 style="color:#aaa;">${req.type} (${req.weight} kg) - Paid: ₹${req.rate}</h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p>Status: <strong style="color: #4ade80;"><i class="fa-solid fa-check-double"></i> Completed</strong></p>${collectorHTML}</div></div>`;
     });
 }
 
@@ -685,13 +723,15 @@ function renderCollectorPickups() {
     availList.innerHTML = pendingReqs.length === 0 ? "<p style='color:#aaa; text-align:center;'>No available pickups match your criteria.</p>" : "";
     pendingReqs.forEach(req => {
         const coordsHTML = req.coords ? `<br><i class="fa-solid fa-satellite" style="font-size:0.8rem; color:#56CCF2;"></i> <span style="font-size:0.85rem; color:#56CCF2;">${req.coords}</span>` : '';
-        availList.innerHTML += `<div class="list-item fade-in"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Expected: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p><i class="fa-solid fa-user"></i> ${req.user_name}</p></div><div style="display:flex; align-items:center;"><button class="btn-gradient" style="padding: 10px 15px; font-size: 0.8rem;" onclick="acceptPickup(${req.id})">Accept Route</button></div></div>`;
+        
+        availList.innerHTML += `<div class="list-item fade-in" style="cursor: pointer;" onclick="openRequestModal(${req.id})"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Expected: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p><i class="fa-solid fa-user"></i> ${req.user_name}</p></div><div style="display:flex; align-items:center;"><button class="btn-gradient" style="padding: 10px 15px; font-size: 0.8rem;" onclick="event.stopPropagation(); acceptPickup(${req.id})">Accept Route</button></div></div>`;
     });
 
     activeRouteList.innerHTML = acceptedReqs.length === 0 ? "<p style='color:#aaa; text-align:center;'>You have no active routes.</p>" : "";
     acceptedReqs.forEach(req => {
         const coordsHTML = req.coords ? `<br><i class="fa-solid fa-satellite" style="font-size:0.8rem; color:#56CCF2;"></i> <span style="font-size:0.85rem; color:#56CCF2;">${req.coords}</span>` : '';
-        activeRouteList.innerHTML += `<div class="list-item fade-in" style="border-left: 4px solid #56CCF2;"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Pay: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p style="color:#56CCF2;"><i class="fa-solid fa-truck-fast"></i> In Progress</p></div><div style="display:flex; align-items:center;"><button class="btn-gradient" style="padding: 10px 15px; font-size: 0.8rem; background: linear-gradient(to right, #4ade80, #059669);" onclick="completePickup(${req.id})">Mark Completed</button></div></div>`;
+        
+        activeRouteList.innerHTML += `<div class="list-item fade-in" style="border-left: 4px solid #56CCF2; cursor: pointer;" onclick="openRequestModal(${req.id})"><img src="${req.image_data}" class="item-image" alt="Waste"><div class="item-details"><h4>${req.type} (${req.weight} kg) - <span style="color:#fff;">Pay: ₹${req.rate}</span></h4><p><i class="fa-solid fa-location-dot"></i> ${req.address}, ${req.city || ''} ${req.pincode ? '- '+req.pincode : ''} ${coordsHTML}</p><p style="color:#56CCF2;"><i class="fa-solid fa-truck-fast"></i> In Progress</p></div><div style="display:flex; align-items:center;"><button class="btn-gradient" style="padding: 10px 15px; font-size: 0.8rem; background: linear-gradient(to right, #4ade80, #059669);" onclick="event.stopPropagation(); completePickup(${req.id})">Mark Completed</button></div></div>`;
     });
 }
 

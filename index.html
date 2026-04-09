@@ -126,7 +126,7 @@
             
             <h1 id="auth-title">Login</h1>
             
-            <form id="login-form">
+            <form id="login-form" onsubmit="submitAuth(event)">
                 <div class="input-container">
                     <label>Email Address</label>
                     <div class="input-wrapper"><i class="fa-regular fa-envelope"></i><input type="email" id="email" placeholder="e.g., yourname@gmail.com" required></div>
@@ -148,7 +148,7 @@
                 </div>
                 <div class="forgot-password"><a href="#" onclick="cancelLogin()" style="float: left;"><i class="fa-solid fa-arrow-left"></i> Back</a><a href="#">Forgot password?</a></div>
                 
-                <button type="button" id="auth-main-btn" class="btn-gradient" onclick="submitAuth()">LOGIN</button>
+                <button type="submit" id="auth-main-btn" class="btn-gradient">LOGIN</button>
             </form>
 
             <div style="margin-top: 20px; font-size: 0.9rem; color: #ccc;">
@@ -329,6 +329,27 @@
                 </div>
                 <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 20px; text-align: center;">Account Role: <strong id="profile-role" style="color: #4ade80; text-transform: uppercase;"></strong></p>
                 <button class="btn-gradient" onclick="saveProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="request-modal" class="modal-overlay hidden">
+        <div class="glass-card modal-card fade-in" style="border-top: 4px solid #4ade80; max-width: 500px; width: 95%;">
+            <div class="modal-header">
+                <h3 style="color: #fff; margin: 0;"><i class="fa-solid fa-box-open" style="color: #4ade80;"></i> Waste Details</h3>
+                <button class="close-btn" onclick="closeRequestModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="text-align: left;">
+                <img id="modal-req-img" src="" alt="Waste Photo" style="width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3);">
+                
+                <h2 id="modal-req-title" style="color: #4ade80; margin-bottom: 5px; font-size: 1.5rem;"></h2>
+                <p id="modal-req-price" style="color: #fff; font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;"></p>
+                
+                <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                    <p style="margin-bottom: 8px; color: #ccc; font-size: 0.9rem;"><i class="fa-solid fa-location-dot" style="color: #56CCF2; width: 20px;"></i> <span id="modal-req-address"></span></p>
+                    <p style="margin-bottom: 8px; color: #ccc; font-size: 0.9rem;"><i class="fa-solid fa-user" style="color: #56CCF2; width: 20px;"></i> <span id="modal-req-user"></span></p>
+                    <p style="margin-bottom: 0; color: #ccc; font-size: 0.9rem;"><i class="fa-solid fa-satellite" style="color: #56CCF2; width: 20px;"></i> <span id="modal-req-coords"></span></p>
+                </div>
             </div>
         </div>
     </div>
